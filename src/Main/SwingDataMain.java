@@ -11,7 +11,10 @@
 
 package Main;
 
-import java.util.ArrayList;
+import java.util.ArrayList;		// imports relevant classes for main
+
+import swingStructure.Pair;
+import swingStructure.SwingDimension;		// imports data structure classes for use in main
 
 public class SwingDataMain {
 
@@ -24,6 +27,7 @@ public class SwingDataMain {
 		System.out.println(swing.searchContinuityAboveValue("ax", 0, 20, 3000.0, 5));
 		System.out.println(swing.backSearchContinuityWithinRange("ax", 7, 2, 3000.0, 6000.0, 2));
 		ArrayList<Pair> rslt = swing.searchMultiContinuityWithinRange("ay", 0, 1000, 0, 6, 3);
+		System.out.println(rslt.size());
 		for (int i = 0; i < rslt.size(); i++) {
 			System.out.println(rslt.get(i).toString());
 		}
