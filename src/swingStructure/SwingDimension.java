@@ -87,12 +87,12 @@ import java.util.Scanner;
 			int count = 0;				// count to compare to winLength
 			for (int i = indexBegin; i <= indexEnd; i++) {		// index end is inclusive
 				if (data.get(i) > threshold && count == 0) {	// if data at given index is greater than threshold for the first time
-					System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + threshold);
+					// test: System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + threshold);
 					targetIndex = i;	// temporarily store first index of success
 					count++;
 				}
 				else if (data.get(i) > threshold && count > 0) {	// if there has been more than one success consecutively
-					System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + threshold);
+					// test: System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + threshold);
 					count++;
 					if (count == winLength) {	// once number of successes has reached winLength
 						return targetIndex;		// return the index of the first success
@@ -119,12 +119,12 @@ import java.util.Scanner;
 			int count = 0;
 			for (int i = indexBegin; i >= indexEnd; i--) {		// from higher indexBegin to lower indexEnd (inclusive), going backwards
 				if (data.get(i) > thresholdLo && data.get(i) < thresholdHi && count == 0) {	// if data at given index is greater than threshold and first success
-					System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
+					// test: System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
 					targetIndex = i;	// store index of first success
 					count++;
 				}
 				else if (data.get(i) > thresholdLo && data.get(i) < thresholdHi && count > 0) { // if more than one success is found consecutively
-					System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
+					// test: System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
 					count++;
 					if (count == winLength) {	// once number of successes has reached winLength
 						return targetIndex;		// return first index of success
@@ -151,11 +151,13 @@ import java.util.Scanner;
 			int count = 0;
 			for (int i = indexBegin; i <= indexEnd; i++) {		// iterate between indexes given
 				if (data1.get(i) > threshold1 && data2.get(i) > threshold2 && count == 0) {	// if a success is found in both data sets for the first time
+					// test: System.out.println("The value at " + i + " which is " + data1.get(i) + " is greater than " + threshold1 + " and the value at " + data2.get(i) + " is greater than " + threshold2);
 					targetIndex = i;	// store index of first success
 					count++;
 				}
 				else if (data1.get(i) > threshold1 && data2.get(i) > threshold2 && count > 0) {	// if a second or more success is found check if winLength is satisfied
 					count++;
+					// test: System.out.println("The value at " + i + " which is " + data1.get(i) + " is greater than " + threshold1 + " and the value at " + data2.get(i) + " is greater than " + threshold2);
 					if (count == winLength) {	// if number of successes is equal to winLength
 						return targetIndex;
 					}
@@ -185,12 +187,12 @@ import java.util.Scanner;
 			int count = 0;
 			for (int i = indexBegin; i <= indexEnd; i++) {		// for each element within range of indexes given
 				if (data.get(i) > thresholdLo && data.get(i) < thresholdHi && count == 0) {	// if data at given index is greater than threshold and this is the first success
-					System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
+					// test: System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
 					firstIndex = i;		// store first index of success
 					count++;
 				}
 				else if (data.get(i) > thresholdLo && data.get(i) < thresholdHi && count > 0) {		// if more than one success in a row is found
-					System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
+					// test: System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
 					count++;
 					if (count >= winLength) {	// if number of successes matches or exceeds winLength
 						if (data.get(i+1) > thresholdLo && data.get(i+1) < thresholdHi) {	// if the next element is a match, continue the loop
@@ -199,12 +201,11 @@ import java.util.Scanner;
 						else {								// if end of streak
 							lastIndex = i;					// store last index
 							Pair targetRange = new Pair(firstIndex, lastIndex);		// create pair to fill when a success is found
-							System.out.println("I am adding.");
 							indexes.add(targetRange);		// add pair to arrayList to be returned
-							count = 0;
+							count = 0;			// reset count when a success has been stored
 						}
 					}
-					else {
+					else {			// if a match is found and count does not equal winLength
 						continue;
 					}
 				}

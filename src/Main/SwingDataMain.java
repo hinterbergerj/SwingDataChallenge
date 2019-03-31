@@ -20,15 +20,19 @@ public class SwingDataMain {
 
 	public static void main (String[] args) {
 		
-		SwingDimension swing = new SwingDimension();
-		String filename = "src\\data\\latestSwing.csv";
-		swing.readIn(filename);
+		SwingDimension swing = new SwingDimension();		// create new structure
+		String filename = "src\\data\\latestSwing.csv";		
+		// test: swing.printAll();
+		// test: swing.printAxis("ax");
+		swing.readIn(filename);			// read data file from path name into structure
 		
 		System.out.println(swing.searchContinuityAboveValue("ax", 0, 20, 3000.0, 5));
 		System.out.println(swing.backSearchContinuityWithinRange("ax", 7, 2, 3000.0, 6000.0, 2));
+		System.out.println(swing.searchContinuityAboveValueTwoSignals("ax", "ay", 0, 100, 1000.0, 1000.0, 3));	// some examples of the methods being run
+		System.out.println(swing.searchContinuityAboveValueTwoSignals("ax", "ay", 0, 100, 0.0, 0.0, 3));
 		ArrayList<Pair> rslt = swing.searchMultiContinuityWithinRange("ay", 0, 1000, 0, 6, 3);
-		System.out.println(rslt.size());
-		for (int i = 0; i < rslt.size(); i++) {
+		// test: System.out.println(rslt.size());
+		for (int i = 0; i < rslt.size(); i++) {			// print staring and ending indexes of success in readable form
 			System.out.println(rslt.get(i).toString());
 		}
 	} 
