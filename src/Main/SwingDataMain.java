@@ -20,11 +20,12 @@ public class SwingDataMain {
 
 	public static void main (String[] args) {
 		
-		SwingDimension swing = new SwingDimension();		// create new structure
+		// create new structure
 		String filename = "src\\data\\latestSwing.csv";		
-		// test: swing.printAll();
-		// test: swing.printAxis("ax");
-		swing.readIn(filename);			// read data file from path name into structure
+		SwingDimension swing = new SwingDimension(filename);
+	//	swing.readIn(filename);			// read data file from path name into structure
+		swing.printAll();
+		swing.printAxis(swing.getAxisArray("ax"));
 		
 		System.out.println(swing.searchContinuityAboveValue("ax", 0, 20, 3000.0, 5));
 		System.out.println(swing.backSearchContinuityWithinRange("ax", 7, 2, 3000.0, 6000.0, 2));
@@ -35,5 +36,6 @@ public class SwingDataMain {
 		for (int i = 0; i < rslt.size(); i++) {			// print staring and ending indexes of success in readable form
 			System.out.println(rslt.get(i).toString());
 		}
+		
 	} 
 }	
