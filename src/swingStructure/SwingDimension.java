@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;		// import relevant classes for the data structure
 import java.util.Collections;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 	public class SwingDimension {	// data structure to read and analyze data given on all axes
 		
@@ -14,6 +15,10 @@ import java.util.Scanner;
 		private ArrayList<Double> wx;
 		private ArrayList<Double> wy;
 		private ArrayList<Double> wz;
+		
+		public enum Axis {
+			AX, AY, AZ, WX, WY, WZ			// declare axis enumerations for print method
+		}
 		
 		public SwingDimension(String filename) {		// constructor takes filename rather than making readIn a separate method
 			ax = new ArrayList<Double>();				// to ensure that structure is filled
@@ -50,12 +55,21 @@ import java.util.Scanner;
 	
 		// method to print a specific axis given in the args
 		
-		public void printAxis(ArrayList<Double> axis) {
-			if (axis.equals(ax) || axis.equals(ay) || axis.equals(az) || axis.equals(wx) || axis.equals(wy) || axis.equals(wz)) {		
-				System.out.println(axis);						// edited printAxis method to ensure that the data type you are entering is in the structure
-			}
-			else {
-				System.out.println("The axis you entered does not exist in the data structure");		// error message
+		public void printAxis(Axis input) {
+			
+			switch(input) {
+				case AX:
+					System.out.println(ax); break;
+				case AZ:
+					System.out.println(az); break;
+				case AY:
+					System.out.println(ay); break;
+				case WX:
+					System.out.println(wx); break;
+				case WZ:
+					System.out.println(wz); break;
+				case WY:
+					System.out.println(wy); break;
 			}
 		}
 	
@@ -85,29 +99,34 @@ import java.util.Scanner;
 			return data;						// returns axis arrayList
 		}
 		
-		private ArrayList<Pair> helperMethod(ArrayList<Double> data, int indexBegin, int indexEnd, double thresholdLo, double thresholdHi, int winLength) {
+		private ArrayList<Pair> helperMethod(ArrayList<Double> data, int indexBegin, int indexEnd, Predicate<Double> check, int winLength) {
+
 			ArrayList<Pair> indexes = new ArrayList<Pair>();	// create arrayList of indexes of success
 			int firstIndex = 0;
 			int lastIndex = 0;		// create temporary values
 			int count = 0;
 			for (int i = indexBegin; i <= indexEnd; i++) {		// for each element within range of indexes given
-				if (data.get(i) > thresholdLo && data.get(i) < thresholdHi && count == 0) {	// if data at given index is greater than threshold and this is the first success
+				if (check.test(data.get(i)) && count == 0) {	// if data at given index is greater than threshold and this is the first success
 					// System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
 					firstIndex = i;		// store first index of success
 					count++;
 				}
-				else if (data.get(i) > thresholdLo && data.get(i) < thresholdHi && count > 0) {		// if more than one success in a row is found
+				else if (check.test(data.get(i)) && count > 0) {		// if more than one success in a row is found
 					// System.out.println("The value at " + i + " which is " + data.get(i) + " is greater than " + thresholdLo + " and less than " + thresholdHi);
 					count++;
-					if (count == winLength) {	// if number of successes matches or exceeds winLength
-						lastIndex = i;					// store last index
-						// System.out.println("about to add index: "+firstIndex+","+lastIndex);
-						Pair targetRange = new Pair(firstIndex, lastIndex);		// create pair to fill when a success is found
-						indexes.add(targetRange);		// add pair to arrayList to be returned
-						count = 0;			// reset count when a success has been stored
-					}
-					else {			// if a match is found and count does not equal winLength
-						continue;
+					if (count >= winLength) {	// if number of successes matches or exceeds winLength
+						count++;
+						if(check.test(data.get(i+1))) {
+							continue;
+						}
+						else {			// if a match is found and count does not equal winLength
+							lastIndex = i;					// store last index
+							// System.out.println("about to add index: "+firstIndex+","+lastIndex);
+							Pair targetRange = new Pair(firstIndex, lastIndex);		// create pair to fill when a success is found
+							indexes.add(targetRange);		// add pair to arrayList to be returned
+							count = 0;			// reset count when a success has been stored
+					
+						}
 					}
 				}
 				else {
@@ -121,8 +140,9 @@ import java.util.Scanner;
 		// value are greater than threshold for at least winLength samples in a row
 		
 		public int searchContinuityAboveValue(String dataName, int indexBegin, int indexEnd, double threshold, int winLength) {
+			Predicate<Double> check = n -> n > threshold;
 			ArrayList<Double> data = getAxisArray(dataName);	// get proper axis array
-			ArrayList<Pair> successes = helperMethod(data, indexBegin, indexEnd, threshold, Integer.MAX_VALUE, winLength);
+			ArrayList<Pair> successes = helperMethod(data, indexBegin, indexEnd, check, winLength);
 			if (successes.size() > 0) {				// if successes occur
 				return successes.get(0).first; 		// return first index of first success
 			}
@@ -137,10 +157,11 @@ import java.util.Scanner;
 		
 		public int backSearchContinuityWithinRange(String dataName, int indexBegin, int indexEnd, double thresholdLo, double thresholdHi, int winLength) {
 			ArrayList<Double> data = getAxisArray(dataName);	// get proper axis array
+			Predicate<Double> check = n -> thresholdLo < n && n < thresholdHi;
 			Collections.reverse(data);			// flip data to be able to search backwards
 			indexBegin = data.size() - 1 - indexBegin;		// adjust indexes accordingly
 			indexEnd = data.size() - 1 - indexEnd;
-			ArrayList<Pair> successes = helperMethod(data, indexBegin, indexEnd, thresholdLo, thresholdHi, winLength);
+			ArrayList<Pair> successes = helperMethod(data, indexBegin, indexEnd, check, winLength);
 			Collections.reverse(data);			// reset data to what it was
 			if (successes.size() > 0) {
 				return data.size() - successes.get(0).first - 1;	// return adjusted index of smallest index of result
@@ -158,31 +179,12 @@ import java.util.Scanner;
 		public int searchContinuityAboveValueTwoSignals(String dataName1, String dataName2, int indexBegin, int indexEnd, double threshold1, double threshold2, int winLength) {
 			ArrayList<Double> data1 = getAxisArray(dataName1);
 			ArrayList<Double> data2 = getAxisArray(dataName2);	// get the two axis arrays
-			int targetIndex = -1;
-			int count = 0;
-			for (int i = indexBegin; i <= indexEnd; i++) {		// iterate between indexes given
-				if (data1.get(i) > threshold1 && data2.get(i) > threshold2 && count == 0) {	// if a success is found in both data sets for the first time
-					// test: System.out.println("The value at " + i + " which is " + data1.get(i) + " is greater than " + threshold1 + " and the value at " + data2.get(i) + " is greater than " + threshold2);
-					targetIndex = i;	// store index of first success
-					count++;
-				}
-				else if (data1.get(i) > threshold1 && data2.get(i) > threshold2 && count > 0) {	// if a second or more success is found check if winLength is satisfied
-					count++;
-					// test: System.out.println("The value at " + i + " which is " + data1.get(i) + " is greater than " + threshold1 + " and the value at " + data2.get(i) + " is greater than " + threshold2);
-					if (count == winLength) {	// if number of successes is equal to winLength
-						return targetIndex;
-					}
-					else {
-						continue;
-					}
-				}
-				else {						// if no match is found or a streak is broken
-					targetIndex = -1;		// reset targetIndex and count
-					count = 0;
-				}
-			}
-			
-			return targetIndex;    // return -1 if no success is found
+			Predicate<Double> check1 = n -> n > threshold1;
+			Predicate<Double> check2 = n -> n > threshold2;
+			ArrayList<Pair> successes1 = helperMethod(data1, indexBegin, indexEnd, check1, winLength);
+			ArrayList<Pair> successes2 = helperMethod(data2, indexBegin, indexEnd, check2, winLength);
+			// check if the successes overlap and return the first point at which they overlap for at least winLength
+			return -1;
 		}
 		
 		// method iterates through array given by dataName and returns an arrayList of Pairs
@@ -192,7 +194,8 @@ import java.util.Scanner;
 		
 		public ArrayList<Pair> searchMultiContinuityWithinRange(String dataName, int indexBegin, int indexEnd, double thresholdLo, double thresholdHi, int winLength) {
 			ArrayList<Double> data = getAxisArray(dataName);	// get proper axis array
-			ArrayList<Pair> successes = helperMethod(data, indexBegin, indexEnd, thresholdLo, thresholdHi, winLength);
+			Predicate<Double> check = n -> thresholdLo < n && n < thresholdHi;
+			ArrayList<Pair> successes = helperMethod(data, indexBegin, indexEnd, check, winLength);
 			ArrayList<Pair> rslt = new ArrayList<Pair>();
 			int tempFirst = 0;
 			int tempLast = 0;

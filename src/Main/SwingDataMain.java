@@ -15,6 +15,7 @@ import java.util.ArrayList;		// imports relevant classes for main
 
 import swingStructure.Pair;
 import swingStructure.SwingDimension;		// imports data structure classes for use in main
+import swingStructure.SwingDimension.Axis;
 
 public class SwingDataMain {
 
@@ -25,7 +26,8 @@ public class SwingDataMain {
 		SwingDimension swing = new SwingDimension(filename);
 	//	swing.readIn(filename);			// read data file from path name into structure
 		swing.printAll();
-		swing.printAxis(swing.getAxisArray("ax"));
+		Axis theAxis = Axis.AX;
+		swing.printAxis(theAxis);
 		
 		System.out.println(swing.searchContinuityAboveValue("ax", 0, 20, 3000.0, 5));
 		System.out.println(swing.backSearchContinuityWithinRange("ax", 7, 2, 3000.0, 6000.0, 2));
